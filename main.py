@@ -2,12 +2,13 @@
 
 import tkinter as tk
 from image_resizer_modal import ImageResizerModal
+from rapport import *
 
 class YourMainApp(tk.Tk):
     def __init__(self):
         super().__init__()
 
-        self.title("Your Main App")
+        self.title("Main app")
         self.geometry("800x600")
 
         self.create_widgets()
