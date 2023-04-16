@@ -4,12 +4,14 @@ import shutil
 import fileinput
 from PIL import ImageTk, Image
 from tkinter import PhotoImage
+from image_resizer_modal import ImageResizerModal
 
 template_file = 'template_file.tex'
 output_file = 'rapport.tex'
 
 liste_des_pages = []
 liste_des_canvas = []
+liste_des_images = []
 
 actual_page_number = 0
 
@@ -107,24 +109,26 @@ class YourMainApp(tk.Tk):
 
         # =================================================== #
         # TEMPLATE TITRE + CHAMP + BOUTTON A REPETER A LENVIE #
-        label4 = tk.Label(self, text="Immatriculation :")
-        label4.grid(row=8, column=0, padx=10, pady=10, sticky="w")
+        label5 = tk.Label(self, text="Immatriculation :")
+        label5.grid(row=8, column=0, padx=10, pady=10, sticky="w")
 
-        champ_texte4 = tk.Entry(self)
-        champ_texte4.grid(row=9, column=0, padx=10, pady=10)
+        global champ_texte5
+        champ_texte5 = tk.Entry(self)
+        champ_texte5.grid(row=9, column=0, padx=10, pady=10)
 
-        bouton4 = tk.Button(self, text="Afficher")
-        bouton4["command"] = lambda: afficher_texte(champ_texte4)
-        bouton4.grid(row=9, column=1, padx=10, pady=10)
+        bouton5 = tk.Button(self, text="Afficher")
+        bouton5["command"] = lambda: afficher_texte(champ_texte5)
+        bouton5.grid(row=9, column=1, padx=10, pady=10)
 
-        liste_des_canvas.append((label4, label4.grid_info()))
-        liste_des_canvas.append((champ_texte4, champ_texte4.grid_info()))
-        liste_des_canvas.append((bouton4, bouton4.grid_info()))
+        liste_des_canvas.append((label5, label5.grid_info()))
+        liste_des_canvas.append((champ_texte5, champ_texte5.grid_info()))
+        liste_des_canvas.append((bouton5, bouton5.grid_info()))
         # =================================================== #
 
         # =================================================== #
         # =========== NE PAS DUPLIQUER ====================== #
         liste_des_pages.append(liste_des_canvas)
+        liste_des_images.append((None))
         # =========== CODE QUI GENERE LES PAGES ============= #
         # =================================================== #
 
@@ -132,7 +136,9 @@ class YourMainApp(tk.Tk):
         widgets = {
             "rapport_title": champ_texte,
             "rapport_date": champ_texte2,
-            "agency_name": champ_texte3
+            "agency_name": champ_texte3,
+            "boat_name": champ_texte4,
+            "boat_imm": champ_texte5
         }
 
         bouton_suivant = tk.Button(self, text="Suivant")
@@ -222,6 +228,7 @@ class YourMainApp(tk.Tk):
         self.replace_in_file_with_key('XI_DATE_EX', champ_texte2.get())
         self.replace_in_file_with_key('XI_MAC_EX', champ_texte3.get())
         self.replace_in_file_with_key('XI_SHIP_NAME_EX', champ_texte4.get())
+        self.replace_in_file_with_key('XI_SHIP_IMM_EX', champ_texte5.get())
         self.CompileLaTeXToPDF()
 
 
@@ -270,6 +277,12 @@ class YourMainApp(tk.Tk):
         bouton["command"] = lambda: afficher_texte(champ_texte)
         bouton.grid(row=1, column=1, padx=10, pady=10)
 
+        add_picture_buton = tk.Button(self, text="Joindre Photo 1", command=lambda: self.show_modal(1))
+        add_picture_buton.grid(row=0, column=4, padx=10, pady=10)
+
+        add_picture_buton2 = tk.Button(self, text="Joindre Photo 2", command=lambda: self.show_modal(2))
+        add_picture_buton2.grid(row=1, column=4, padx=10, pady=10)
+
         label2 = tk.Label(self, text="Etat de la partie")
         label2.grid(row=2, column=0, padx=10, pady=10, sticky="w")
 
@@ -278,19 +291,19 @@ class YourMainApp(tk.Tk):
 
         bouton11 = tk.Button(self, text="Critique")
         bouton11["command"] = lambda: self.modifier_champ_etat('c', champ_etat)
-        bouton11.grid(row=9, column=0, padx=0, pady=0, sticky="")
+        bouton11.grid(row=9, column=0, padx=0, pady=0, sticky="", ipadx=20)
 
         bouton12 = tk.Button(self, text="Grave")
         bouton12["command"] = lambda: self.modifier_champ_etat('g', champ_etat)
-        bouton12.grid(row=9, column=1, padx=1, pady=0, sticky="", columnspan=1)
+        bouton12.grid(row=9, column=1, padx=1, pady=0, sticky="", columnspan=1, ipadx=20)
 
         bouton13 = tk.Button(self, text="Moyen")
         bouton13["command"] = lambda: self.modifier_champ_etat('m', champ_etat)
-        bouton13.grid(row=9, column=2, padx=0, pady=10, sticky="", columnspan=1)
+        bouton13.grid(row=9, column=2, padx=0, pady=10, sticky="", columnspan=1, ipadx=20)
 
         bouton14 = tk.Button(self, text="Bon")
         bouton14["command"] = lambda: self.modifier_champ_etat('b', champ_etat)
-        bouton14.grid(row=9, column=3, padx=0, pady=0, sticky="", columnspan=2)
+        bouton14.grid(row=9, column=3, padx=0, pady=0, sticky="", columnspan=2, ipadx=20)
 
         label22 = tk.Label(self, text="")
         label22.grid(row=10, column=0, padx=10, pady=10, sticky="w", columnspan=2)    
@@ -301,8 +314,6 @@ class YourMainApp(tk.Tk):
 
         liste_des_canvas.append((label2, label2.grid_info()))
 
-
-
         liste_des_canvas.append((bouton11, bouton11.grid_info()))
         liste_des_canvas.append((bouton12, bouton12.grid_info()))
         liste_des_canvas.append((bouton13, bouton13.grid_info()))
@@ -310,14 +321,42 @@ class YourMainApp(tk.Tk):
         liste_des_canvas.append((champ_etat, champ_etat.grid_info()))
 
         liste_des_pages.append(liste_des_canvas)
+        liste_des_images.append((None, None))
+
+    def display_image(self, image_path, x, y):
+        # Ouvrir l'image à l'aide de la bibliothèque PIL
+        if (image_path != None):
+            image = Image.open(image_path)
+            # Convertir l'image en PhotoImage
+            photo = ImageTk.PhotoImage(image)
+
+            # Créer un widget Label pour afficher l'image
+            label = tk.Label(self, image=photo)
+            label.image = photo  # Conserver une référence à l'image pour éviter la suppression par le garbage collector
+            label.grid(row=x, column=y)  # Positionner l'image aux coordonnées (x, y)
+            # label.grid(row=0, column=0, padx=10, pady=10, sticky="w") #
+            liste_des_pages[actual_page_number].append((label, label.grid_info()))
 
 
 # =================================================== #
 #            PARTIE OUVRANT LA MODALE PhotoImage      #
 # =================================================== #
-    def show_modal(self):
+    def show_modal(self, image_number):
         image_resizer_modal = ImageResizerModal(self)
         image_resizer_modal.grab_set()
+        self.wait_window(image_resizer_modal)  # Attendez que la fenêtre modale soit fermée
+        saved_image_path = image_resizer_modal.get_saved_image_path()  # Récupérez la valeur de retour
+        print(f"Image sauvegardée: {saved_image_path}")
+        self.display_image(saved_image_path, 10, image_number)
+        # Convertir le tuple en liste
+        temp_list = list(liste_des_images[actual_page_number])
+
+        # Modifier l'élément à la position image_number
+        temp_list[image_number] = saved_image_path
+
+        # Reconvertir la liste en tuple et l'assigner à la position actual_page_number
+        liste_des_images[actual_page_number] = tuple(temp_list)
+        return saved_image_path
 # =================================================== #
 
 

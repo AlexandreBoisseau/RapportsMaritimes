@@ -15,6 +15,7 @@ class ImageResizerModal(tk.Toplevel):
         self.geometry("800x600")
 
         self.create_widgets()
+        self.saved_image_path = None
 
     def create_widgets(self):
         print('Tk.Topleve modale')
@@ -73,6 +74,10 @@ class ImageResizerModal(tk.Toplevel):
         cropped_image = self.image.crop(((x1 - self.image_pos[0]) * x_ratio, (y1 - self.image_pos[1]) * y_ratio, (x2 - self.image_pos[0]) * x_ratio, (y2 - self.image_pos[1]) * y_ratio))
         cropped_image.save(new_file_path)
         messagebox.showinfo("Sauvegarde réussie", f"L'image a été sauvegardée avec succès sous le nom {file_name}CPY{file_ext}.")
+        self.saved_image_path = new_file_path  # Stockez la valeur de retour dans l'attribut
+
+    def get_saved_image_path(self):
+        return self.saved_image_path
 
     def move_rectangle(self, event):
         width = int(self.rectangle_width_entry.get())
