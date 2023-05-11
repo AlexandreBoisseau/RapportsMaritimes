@@ -229,8 +229,32 @@ class YourMainApp(tk.Tk):
         self.replace_in_file_with_key('XI_MAC_EX', champ_texte3.get())
         self.replace_in_file_with_key('XI_SHIP_NAME_EX', champ_texte4.get())
         self.replace_in_file_with_key('XI_SHIP_IMM_EX', champ_texte5.get())
-        self.CompileLaTeXToPDF()
 
+
+        with open('new_page_template.tex', 'r') as file:
+            template_new_page = file.read()
+
+        i = 1
+        for page in liste_des_pages[1:]:
+            self.replace_in_file_with_key('XI_PAGES_EX', template_new_page)
+            self.replace_in_file_with_key('XI_TEMPLATE_END_EX', 'XI_PAGES_EX')
+            for (canvas, opt) in page:
+                if (isinstance(canvas, tk.Entry)):
+                    self.replace_in_file_with_key('XI_TEMPLATE_TITLE_EX', canvas.get())
+            self.replace_in_file_with_key('XI_TEMPLATE_CONTENT_TEXT_EX', 'Champ texte non rempli')
+            if (liste_des_images[i][0]):
+                self.replace_in_file_with_key('XI_IMAGE_1_CONTENT_EX', '\\includegraphics[scale=1.5]{' 
+                    + liste_des_images[i][0] + '}')
+            else:
+                self.replace_in_file_with_key('XI_IMAGE_1_CONTENT_EX', '')
+            if (liste_des_images[i][1]):
+                self.replace_in_file_with_key('XI_IMAGE_2_CONTENT_EX', '\\includegraphics[scale=1.5]{' 
+                    + liste_des_images[i][1] + '}')
+            else:
+                self.replace_in_file_with_key('XI_IMAGE_2_CONTENT_EX', '')
+            i += 1
+        self.replace_in_file_with_key('XI_PAGES_EX', '')
+        self.CompileLaTeXToPDF()
 
     def compile_to_pdf(self):
         result = []
@@ -352,7 +376,7 @@ class YourMainApp(tk.Tk):
         temp_list = list(liste_des_images[actual_page_number])
 
         # Modifier l'élément à la position image_number
-        temp_list[image_number] = saved_image_path
+        temp_list[image_number - 1] = saved_image_path
 
         # Reconvertir la liste en tuple et l'assigner à la position actual_page_number
         liste_des_images[actual_page_number] = tuple(temp_list)
