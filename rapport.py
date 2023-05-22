@@ -12,6 +12,7 @@ output_file = 'rapport.tex'
 liste_des_pages = []
 liste_des_canvas = []
 liste_des_images = []
+liste_des_etats = ['X']
 
 actual_page_number = 0
 
@@ -35,16 +36,9 @@ class YourMainApp(tk.Tk):
         champ_texte = tk.Entry(self)
         champ_texte.grid(row=1, column=0, padx=10, pady=10)
 
-        # Création et placement du bouton
-        global buton
-        bouton = tk.Button(self, text="Afficher")
-        bouton["command"] = lambda: afficher_texte(champ_texte)
-        bouton.grid(row=1, column=1, padx=10, pady=10)
-
         global liste_des_canvas
         liste_des_canvas.append((label, label.grid_info()))
         liste_des_canvas.append((champ_texte, champ_texte.grid_info()))
-        liste_des_canvas.append((bouton, bouton.grid_info()))
         # =================================================== #
 
         # =================================================== #
@@ -57,14 +51,8 @@ class YourMainApp(tk.Tk):
         champ_texte2 = tk.Entry(self)
         champ_texte2.grid(row=3, column=0, padx=10, pady=10)
 
-        global bouton2
-        bouton2 = tk.Button(self, text="Afficher")
-        bouton2["command"] = lambda: afficher_texte(champ_texte2)
-        bouton2.grid(row=3, column=1, padx=10, pady=10)
-
         liste_des_canvas.append((label2, label2.grid_info()))
         liste_des_canvas.append((champ_texte2, champ_texte2.grid_info()))
-        liste_des_canvas.append((bouton2, bouton2.grid_info()))
         # =================================================== #
 
         # =================================================== #
@@ -77,14 +65,8 @@ class YourMainApp(tk.Tk):
         champ_texte3 = tk.Entry(self)
         champ_texte3.grid(row=5, column=0, padx=10, pady=10)
 
-        global bouton3
-        bouton3 = tk.Button(self, text="Afficher")
-        bouton3["command"] = lambda: afficher_texte(champ_texte3)
-        bouton3.grid(row=5, column=1, padx=10, pady=10)
-
         liste_des_canvas.append((label3, label3.grid_info()))
         liste_des_canvas.append((champ_texte3, champ_texte3.grid_info()))
-        liste_des_canvas.append((bouton3, bouton3.grid_info()))
         # =================================================== #
 
         # =================================================== #
@@ -97,14 +79,8 @@ class YourMainApp(tk.Tk):
         champ_texte4 = tk.Entry(self)
         champ_texte4.grid(row=7, column=0, padx=10, pady=10)
 
-        global bouton4
-        bouton4 = tk.Button(self, text="Afficher")
-        bouton4["command"] = lambda: afficher_texte(champ_texte4)
-        bouton4.grid(row=7, column=1, padx=10, pady=10)
-
         liste_des_canvas.append((label4, label4.grid_info()))
         liste_des_canvas.append((champ_texte4, champ_texte4.grid_info()))
-        liste_des_canvas.append((bouton4, bouton4.grid_info()))
         # =================================================== #
 
         # =================================================== #
@@ -116,14 +92,75 @@ class YourMainApp(tk.Tk):
         champ_texte5 = tk.Entry(self)
         champ_texte5.grid(row=9, column=0, padx=10, pady=10)
 
-        bouton5 = tk.Button(self, text="Afficher")
-        bouton5["command"] = lambda: afficher_texte(champ_texte5)
-        bouton5.grid(row=9, column=1, padx=10, pady=10)
-
         liste_des_canvas.append((label5, label5.grid_info()))
         liste_des_canvas.append((champ_texte5, champ_texte5.grid_info()))
-        liste_des_canvas.append((bouton5, bouton5.grid_info()))
         # =================================================== #
+
+        #           Partie de droite de l'interface           #
+
+        # =================================================== #
+        # Création et placement du label
+        label111 = tk.Label(self, text="Mandateur de l'expertise :")
+        label111.grid(row=0, column=3, padx=10, pady=10, sticky="w")
+
+        # Création et placement du champ de texte
+        global champ_texte111
+        champ_texte111 = tk.Entry(self)
+        champ_texte111.grid(row=1, column=3, padx=10, pady=10)
+
+        liste_des_canvas.append((label111, label111.grid_info()))
+        liste_des_canvas.append((champ_texte111, champ_texte111.grid_info()))
+        # =================================================== #
+
+        # =================================================== #
+        # TEMPLATE TITRE + CHAMP + BOUTTON A REPETER A LENVIE #
+        label112 = tk.Label(self, text="Type de bateau :")
+        label112.grid(row=2, column=3, padx=10, pady=10, sticky="w")
+
+        global champ_texte112
+        champ_texte112 = tk.Entry(self)
+        champ_texte112.grid(row=3, column=3, padx=10, pady=10)
+
+        liste_des_canvas.append((label112, label112.grid_info()))
+        liste_des_canvas.append((champ_texte112, champ_texte112.grid_info()))
+        # =================================================== #
+
+        # =================================================== #
+        label113 = tk.Label(self, text="Port du bateau :")
+        label113.grid(row=4, column=3, padx=10, pady=10, sticky="w")
+
+        global champ_texte113
+        champ_texte113 = tk.Entry(self)
+        champ_texte113.grid(row=5, column=3, padx=10, pady=10)
+
+        liste_des_canvas.append((label113, label113.grid_info()))
+        liste_des_canvas.append((champ_texte113, champ_texte113.grid_info()))
+        # =================================================== #
+
+        # =================================================== #
+        label114 = tk.Label(self, text="Année de construction du bateau :")
+        label114.grid(row=6, column=3, padx=10, pady=10, sticky="w")
+
+        global champ_texte114
+        champ_texte114 = tk.Entry(self)
+        champ_texte114.grid(row=7, column=3, padx=10, pady=10)
+
+        liste_des_canvas.append((label114, label114.grid_info()))
+        liste_des_canvas.append((champ_texte114, champ_texte114.grid_info()))
+        # =================================================== #
+
+        # =================================================== #
+        label115 = tk.Label(self, text="Chantier maritime du bateau :")
+        label115.grid(row=8, column=3, padx=10, pady=10, sticky="w")
+
+        global champ_texte115
+        champ_texte115 = tk.Entry(self)
+        champ_texte115.grid(row=9, column=3, padx=10, pady=10)
+
+        liste_des_canvas.append((label115, label115.grid_info()))
+        liste_des_canvas.append((champ_texte115, champ_texte115.grid_info()))
+        # =================================================== #
+
 
         # =================================================== #
         # =========== NE PAS DUPLIQUER ====================== #
@@ -145,9 +182,9 @@ class YourMainApp(tk.Tk):
         bouton_suivant["command"] = lambda: self.change_page('n')
         bouton_suivant.grid(row=100, column=3, padx=10, pady=10)
 
-        bouton_precedent = tk.Button(self, text="Générer le rapport")
-        bouton_precedent["command"] = lambda: self.compile_to_pdf()
-        bouton_precedent.grid(row=100, column=1, padx=10, pady=10)
+        bouton_compiler = tk.Button(self, text="Générer le rapport")
+        bouton_compiler["command"] = lambda: self.compile_to_pdf()
+        bouton_compiler.grid(row=100, column=1, padx=10, pady=10)
 
         bouton_precedent = tk.Button(self, text="Précédent")
         bouton_precedent["command"] = lambda: self.change_page('p')
@@ -229,7 +266,11 @@ class YourMainApp(tk.Tk):
         self.replace_in_file_with_key('XI_MAC_EX', champ_texte3.get())
         self.replace_in_file_with_key('XI_SHIP_NAME_EX', champ_texte4.get())
         self.replace_in_file_with_key('XI_SHIP_IMM_EX', champ_texte5.get())
-
+        self.replace_in_file_with_key('XI_SHIP_REQUESTER_EX', champ_texte111.get())
+        self.replace_in_file_with_key('XI_SHIP_TYPE_EX', champ_texte112.get())
+        self.replace_in_file_with_key('XI_SHIP_SEAPORT_EX', champ_texte113.get())
+        self.replace_in_file_with_key('XI_SHIP_CONSTRUCTION_YEAR_EX', champ_texte114.get())
+        self.replace_in_file_with_key('XI_SHIP_NAVAL_WORKSITE_EX', champ_texte115.get())
 
         with open('new_page_template.tex', 'r') as file:
             template_new_page = file.read()
@@ -240,18 +281,25 @@ class YourMainApp(tk.Tk):
             self.replace_in_file_with_key('XI_TEMPLATE_END_EX', 'XI_PAGES_EX')
             for (canvas, opt) in page:
                 if (isinstance(canvas, tk.Entry)):
-                    self.replace_in_file_with_key('XI_TEMPLATE_TITLE_EX', canvas.get())
+                    self.replace_in_file_with_key('XI_TEMPLATE_TITLE_EX', canvas.get())  
             self.replace_in_file_with_key('XI_TEMPLATE_CONTENT_TEXT_EX', 'Champ texte non rempli')
             if (liste_des_images[i][0]):
-                self.replace_in_file_with_key('XI_IMAGE_1_CONTENT_EX', '\\includegraphics[scale=1.5]{' 
+                self.replace_in_file_with_key('XI_IMAGE_1_CONTENT_EX', '\\includegraphics[scale=0.75]{' 
                     + liste_des_images[i][0] + '}')
             else:
                 self.replace_in_file_with_key('XI_IMAGE_1_CONTENT_EX', '')
             if (liste_des_images[i][1]):
-                self.replace_in_file_with_key('XI_IMAGE_2_CONTENT_EX', '\\includegraphics[scale=1.5]{' 
+                self.replace_in_file_with_key('XI_IMAGE_2_CONTENT_EX', '\\includegraphics[scale=0.75]{' 
                     + liste_des_images[i][1] + '}')
             else:
                 self.replace_in_file_with_key('XI_IMAGE_2_CONTENT_EX', '')
+            
+            if (liste_des_etats[i] != 'X'):
+                etat_partie_png = '\\includegraphics[scale=0.75]{' + liste_des_etats[i] + '.png}'
+                self.replace_in_file_with_key('XI_STATE_STATUS_EX', etat_partie_png)
+            else:
+                self.replace_in_file_with_key('XI_STATE_STATUS_EX', '')
+
             i += 1
         self.replace_in_file_with_key('XI_PAGES_EX', '')
         self.CompileLaTeXToPDF()
@@ -287,6 +335,8 @@ class YourMainApp(tk.Tk):
             field["text"] = 'bon état'
             field["bg"] = 'AntiqueWhite2'
             field["fg"] = 'green'
+        liste_des_etats[actual_page_number] = etat
+
 
     def create_new_expertise_page(self):
         liste_des_canvas = []
@@ -296,10 +346,6 @@ class YourMainApp(tk.Tk):
 
         champ_texte = tk.Entry(self)
         champ_texte.grid(row=1, column=0, padx=10, pady=10)
-
-        bouton = tk.Button(self, text="Afficher")
-        bouton["command"] = lambda: afficher_texte(champ_texte)
-        bouton.grid(row=1, column=1, padx=10, pady=10)
 
         add_picture_buton = tk.Button(self, text="Joindre Photo 1", command=lambda: self.show_modal(1))
         add_picture_buton.grid(row=0, column=4, padx=10, pady=10)
@@ -346,6 +392,7 @@ class YourMainApp(tk.Tk):
 
         liste_des_pages.append(liste_des_canvas)
         liste_des_images.append((None, None))
+        liste_des_etats.append('X')
 
     def display_image(self, image_path, x, y):
         # Ouvrir l'image à l'aide de la bibliothèque PIL
