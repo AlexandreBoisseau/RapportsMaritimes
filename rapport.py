@@ -5,6 +5,7 @@ import fileinput
 from PIL import ImageTk, Image
 from tkinter import PhotoImage
 from image_resizer_modal import ImageResizerModal
+import webbrowser
 
 template_file = 'template_file.tex'
 output_file = 'rapport.tex'
@@ -25,11 +26,13 @@ class YourMainApp(tk.Tk):
         self.title("Exemple avec label, champ de texte et bouton")
         # =================================================== #
 
-
         # =================================================== #
         # Création et placement du label
         label = tk.Label(self, text="Titre du rapport :")
         label.grid(row=0, column=0, padx=10, pady=10, sticky="w")
+
+        self.btnONOFF = tk.Button(self, text="OFF", command=self.toggle, bg="red")
+        self.btnONOFF.grid(row=100, column=100, padx=100, pady=100)
 
         # Création et placement du champ de texte
         global champ_texte
@@ -39,6 +42,7 @@ class YourMainApp(tk.Tk):
         global liste_des_canvas
         liste_des_canvas.append((label, label.grid_info()))
         liste_des_canvas.append((champ_texte, champ_texte.grid_info()))
+        liste_des_canvas.append((self.btnONOFF, self.btnONOFF.grid_info()))
         # =================================================== #
 
         # =================================================== #
@@ -190,6 +194,15 @@ class YourMainApp(tk.Tk):
         bouton_precedent["command"] = lambda: self.change_page('p')
         bouton_precedent.grid(row=100, column=0, padx=10, pady=10, sticky="w")
 
+    def toggle(self):
+        if self.btnONOFF.config('text')[-1] == 'OFF':
+            self.btnONOFF.config(text='ON', bg="green")
+        else:
+            self.btnONOFF.config(text='OFF', bg="red")
+    
+    def get_auto_open_status(self):
+        return self.btnONOFF.config('text')[-1]
+
     def afficher_texte(champ):
         contenu = champ.get()
         print(contenu)
@@ -210,6 +223,7 @@ class YourMainApp(tk.Tk):
 
     def change_page(self, next_or_prev):
         global actual_page_number
+
         if actual_page_number == 0 and next_or_prev == 'p':
             return
 
@@ -222,6 +236,7 @@ class YourMainApp(tk.Tk):
             self.show_page(actual_page_number)
 
         self.update_idletasks()
+        print("Now on page ", actual_page_number)
 
     def replace_in_file_with_key(self, key, replace_content):
         with fileinput.FileInput('rapport.tex', inplace = True, backup ='.bak') as f:
@@ -238,6 +253,8 @@ class YourMainApp(tk.Tk):
 
     def CompileLaTeXToPDF(self):
         subprocess.run(["pdflatex", 'rapport.tex'])
+        if (app.get_auto_open_status() == "ON"):
+            subprocess.run(['open', '-a', 'Preview', 'rapport.pdf'])
 
     def LaTeXifier(self, array_of_info):
         shutil.copyfile(template_file, 'rapport.tex')
@@ -380,7 +397,6 @@ class YourMainApp(tk.Tk):
 
         liste_des_canvas.append((label, label.grid_info()))
         liste_des_canvas.append((champ_texte, champ_texte.grid_info()))
-        liste_des_canvas.append((bouton, bouton.grid_info()))
 
         liste_des_canvas.append((label2, label2.grid_info()))
 
@@ -389,6 +405,8 @@ class YourMainApp(tk.Tk):
         liste_des_canvas.append((bouton13, bouton13.grid_info()))
         liste_des_canvas.append((bouton14, bouton14.grid_info()))
         liste_des_canvas.append((champ_etat, champ_etat.grid_info()))
+        liste_des_canvas.append((add_picture_buton, add_picture_buton.grid_info()))
+        liste_des_canvas.append((add_picture_buton2, add_picture_buton2.grid_info()))
 
         liste_des_pages.append(liste_des_canvas)
         liste_des_images.append((None, None))
