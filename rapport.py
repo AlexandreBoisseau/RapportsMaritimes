@@ -6,6 +6,9 @@ from PIL import ImageTk, Image
 from tkinter import PhotoImage
 from image_resizer_modal import ImageResizerModal
 import webbrowser
+import time
+import os
+import openai
 
 template_file = 'template_file.tex'
 output_file = 'rapport.tex'
@@ -23,16 +26,15 @@ class YourMainApp(tk.Tk):
         super().__init__()
         # =================================================== #
         # Création de la fenêtre principale
-        self.title("Exemple avec label, champ de texte et bouton")
+        self.title("Editeur de rapports")
+        self.geometry("800x600")
+        self.resizable(False, False)
         # =================================================== #
 
         # =================================================== #
         # Création et placement du label
         label = tk.Label(self, text="Titre du rapport :")
         label.grid(row=0, column=0, padx=10, pady=10, sticky="w")
-
-        self.btnONOFF = tk.Button(self, text="OFF", command=self.toggle, bg="red")
-        self.btnONOFF.grid(row=100, column=100, padx=100, pady=100)
 
         # Création et placement du champ de texte
         global champ_texte
@@ -42,7 +44,6 @@ class YourMainApp(tk.Tk):
         global liste_des_canvas
         liste_des_canvas.append((label, label.grid_info()))
         liste_des_canvas.append((champ_texte, champ_texte.grid_info()))
-        liste_des_canvas.append((self.btnONOFF, self.btnONOFF.grid_info()))
         # =================================================== #
 
         # =================================================== #
@@ -184,18 +185,28 @@ class YourMainApp(tk.Tk):
 
         bouton_suivant = tk.Button(self, text="Suivant")
         bouton_suivant["command"] = lambda: self.change_page('n')
-        bouton_suivant.grid(row=100, column=3, padx=10, pady=10)
+        bouton_suivant.grid(row=90, column=3, padx=10, pady=10, sticky='e')
 
         bouton_compiler = tk.Button(self, text="Générer le rapport")
         bouton_compiler["command"] = lambda: self.compile_to_pdf()
-        bouton_compiler.grid(row=100, column=1, padx=10, pady=10)
+        bouton_compiler.grid(row=90, column=1, padx=10, pady=10)
+
+        self.btnONOFF = tk.Button(self, text="OFF", command=self.toggle_auto_open, bg="red")
+        self.btnONOFF.grid(row=90, column=2)
 
         bouton_precedent = tk.Button(self, text="Précédent")
         bouton_precedent["command"] = lambda: self.change_page('p')
-        bouton_precedent.grid(row=100, column=0, padx=10, pady=10, sticky="w")
+        bouton_precedent.grid(row=90, column=0, padx=10, pady=10, sticky="w")
 
-    def toggle(self):
+        self.page_number_var = tk.StringVar()
+        label_page_number = tk.Label(self, textvariable=self.page_number_var)
+        label_page_number.grid(row=100, column=1, columnspan=2, padx=10, pady=10, sticky="ew")
+
+        self.update_page_number(actual_page_number)
+
+    def toggle_auto_open(self):
         if self.btnONOFF.config('text')[-1] == 'OFF':
+
             self.btnONOFF.config(text='ON', bg="green")
         else:
             self.btnONOFF.config(text='OFF', bg="red")
@@ -221,7 +232,12 @@ class YourMainApp(tk.Tk):
         for (canvas, opt) in page:
             canvas.grid(opt)
 
+    def update_page_number(self, new_page_number):
+        string_new_page = "Nouvelle page numéro : " + str(new_page_number + 1) + " / " + str(len(liste_des_pages))
+        self.page_number_var.set(string_new_page)
+
     def change_page(self, next_or_prev):
+        print(liste_des_images)
         global actual_page_number
 
         if actual_page_number == 0 and next_or_prev == 'p':
@@ -235,6 +251,7 @@ class YourMainApp(tk.Tk):
             actual_page_number -= 1
             self.show_page(actual_page_number)
 
+        self.update_page_number(actual_page_number)
         self.update_idletasks()
         print("Now on page ", actual_page_number)
 
@@ -253,6 +270,9 @@ class YourMainApp(tk.Tk):
 
     def CompileLaTeXToPDF(self):
         subprocess.run(["pdflatex", 'rapport.tex'])
+        #Obligé de compiler deux fois pour avoir la table des matiere
+        subprocess.run(["pdflatex", 'rapport.tex']) 
+
         if (app.get_auto_open_status() == "ON"):
             subprocess.run(['open', '-a', 'Preview', 'rapport.pdf'])
 
@@ -299,7 +319,8 @@ class YourMainApp(tk.Tk):
             for (canvas, opt) in page:
                 if (isinstance(canvas, tk.Entry)):
                     self.replace_in_file_with_key('XI_TEMPLATE_TITLE_EX', canvas.get())  
-            self.replace_in_file_with_key('XI_TEMPLATE_CONTENT_TEXT_EX', 'Champ texte non rempli')
+            self.replace_in_file_with_key('XI_TEMPLATE_CONTENT_TEXT_EX', '')
+            self.replace_in_file_with_key('XI_TEMPLATE_CONTENT_TEXT_2_EX', '')
             if (liste_des_images[i][0]):
                 self.replace_in_file_with_key('XI_IMAGE_1_CONTENT_EX', '\\includegraphics[scale=0.75]{' 
                     + liste_des_images[i][0] + '}')
@@ -356,19 +377,24 @@ class YourMainApp(tk.Tk):
 
 
     def create_new_expertise_page(self):
+        for i in range(30):
+            self.grid_columnconfigure(i, weight=2)
         liste_des_canvas = []
 
-        label = tk.Label(self, text="Partie du bateau :")
-        label.grid(row=0, column=0, padx=10, pady=10, sticky="w")
+        delete_page_buton = tk.Button(self, text="Supprimer la page", command=lambda: self.delete_page())
+        delete_page_buton.grid(row=0, column=0, padx=10, pady=0, sticky="w")
 
-        champ_texte = tk.Entry(self)
-        champ_texte.grid(row=1, column=0, padx=10, pady=10)
+        label_partie_du_bateau = tk.Label(self, text="Partie du bateau :")
+        label_partie_du_bateau.grid(row=1, column=0, padx=10, pady=10, sticky="w")
+
+        champ_texte_partie_du_bateau = tk.Entry(self)
+        champ_texte_partie_du_bateau.grid(row=1, column=0, columnspan=3, sticky="ew", padx=(150, 0))
 
         add_picture_buton = tk.Button(self, text="Joindre Photo 1", command=lambda: self.show_modal(1))
-        add_picture_buton.grid(row=0, column=4, padx=10, pady=10)
+        add_picture_buton.grid(row=0, column=3, padx=10, pady=10)
 
         add_picture_buton2 = tk.Button(self, text="Joindre Photo 2", command=lambda: self.show_modal(2))
-        add_picture_buton2.grid(row=1, column=4, padx=10, pady=10)
+        add_picture_buton2.grid(row=1, column=3, padx=10, pady=10)
 
         label2 = tk.Label(self, text="Etat de la partie")
         label2.grid(row=2, column=0, padx=10, pady=10, sticky="w")
@@ -378,27 +404,63 @@ class YourMainApp(tk.Tk):
 
         bouton11 = tk.Button(self, text="Critique")
         bouton11["command"] = lambda: self.modifier_champ_etat('c', champ_etat)
-        bouton11.grid(row=9, column=0, padx=0, pady=0, sticky="", ipadx=20)
+        bouton11.grid(row=9, column=0, padx=0, pady=0, sticky="ew")
 
         bouton12 = tk.Button(self, text="Grave")
         bouton12["command"] = lambda: self.modifier_champ_etat('g', champ_etat)
-        bouton12.grid(row=9, column=1, padx=1, pady=0, sticky="", columnspan=1, ipadx=20)
+        bouton12.grid(row=9, column=1, padx=0, pady=0, sticky="ew")
 
         bouton13 = tk.Button(self, text="Moyen")
         bouton13["command"] = lambda: self.modifier_champ_etat('m', champ_etat)
-        bouton13.grid(row=9, column=2, padx=0, pady=10, sticky="", columnspan=1, ipadx=20)
+        bouton13.grid(row=9, column=2, padx=0, pady=0, sticky="ew")
 
         bouton14 = tk.Button(self, text="Bon")
         bouton14["command"] = lambda: self.modifier_champ_etat('b', champ_etat)
-        bouton14.grid(row=9, column=3, padx=0, pady=0, sticky="", columnspan=2, ipadx=20)
+        bouton14.grid(row=9, column=3, padx=0, pady=0, sticky="ew")
 
-        label22 = tk.Label(self, text="")
-        label22.grid(row=10, column=0, padx=10, pady=10, sticky="w", columnspan=2)    
+        line_break1 = tk.Label(self, text="")
+        line_break1.grid(row=10, column=0, padx=10, pady=10, sticky="w")    
 
-        liste_des_canvas.append((label, label.grid_info()))
-        liste_des_canvas.append((champ_texte, champ_texte.grid_info()))
+        label_commentaires = tk.Label(self, text="Mots-clés :")
+        label_commentaires.grid(row=11, column=0, padx=10, pady=10, sticky="w")
 
-        liste_des_canvas.append((label2, label2.grid_info()))
+        champ_texte_commentaires = tk.Text(self, wrap=tk.WORD, width=30, height=3)
+        champ_texte_commentaires.grid(sticky='nsew', row=12, column=0, padx=10, pady=10)
+
+        text_generation_buton = tk.Button(self, text="Générer le texte")
+        text_generation_buton.grid(row=13, column=0, padx=10, pady=10)
+
+        label_commentaires2 = tk.Label(self, text="Commentaires :")
+        label_commentaires2.grid(row=11, column=1, padx=10, pady=10, sticky="w")
+        
+        champ_texte_commentaires2 = tk.Text(self, wrap=tk.WORD, width=80, height=6)
+        champ_texte_commentaires2.grid(sticky='nsew', columnspan=3, row=12, column=1, padx=10, pady=10)
+
+        line_break2 = tk.Label(self, text="")
+        line_break2.grid(row=10, column=0, padx=10, pady=10, sticky="w")  
+
+        alignement1 = tk.Label(self, text="", width=230)
+        alignement1.grid(row=99, column=0)
+
+        alignement2 = tk.Label(self, text="", width=230)
+        alignement2.grid(row=99, column=1)
+
+        alignement3 = tk.Label(self, text="", width=230)
+        alignement3.grid(row=99, column=2)
+
+        alignement4 = tk.Label(self, text="", width=230)
+        alignement4.grid(row=99, column=3)
+
+        liste_des_canvas.append((label_partie_du_bateau, label_partie_du_bateau.grid_info()))
+        liste_des_canvas.append((champ_texte_partie_du_bateau, champ_texte_partie_du_bateau.grid_info()))
+        liste_des_canvas.append((delete_page_buton, delete_page_buton.grid_info()))
+        liste_des_canvas.append((line_break1, line_break1.grid_info()))
+        liste_des_canvas.append((line_break2, line_break2.grid_info()))
+        liste_des_canvas.append((label_commentaires, label_commentaires.grid_info()))
+        liste_des_canvas.append((champ_texte_commentaires, champ_texte_commentaires.grid_info()))
+        liste_des_canvas.append((text_generation_buton, text_generation_buton.grid_info()))
+        liste_des_canvas.append((label_commentaires2, label_commentaires2.grid_info()))
+        liste_des_canvas.append((champ_texte_commentaires2, champ_texte_commentaires2.grid_info()))
 
         liste_des_canvas.append((bouton11, bouton11.grid_info()))
         liste_des_canvas.append((bouton12, bouton12.grid_info()))
@@ -408,6 +470,11 @@ class YourMainApp(tk.Tk):
         liste_des_canvas.append((add_picture_buton, add_picture_buton.grid_info()))
         liste_des_canvas.append((add_picture_buton2, add_picture_buton2.grid_info()))
 
+        liste_des_canvas.append((alignement1, alignement1.grid_info()))
+        liste_des_canvas.append((alignement2, alignement2.grid_info()))
+        liste_des_canvas.append((alignement3, alignement3.grid_info()))
+        liste_des_canvas.append((alignement4, alignement4.grid_info()))
+
         liste_des_pages.append(liste_des_canvas)
         liste_des_images.append((None, None))
         liste_des_etats.append('X')
@@ -416,20 +483,50 @@ class YourMainApp(tk.Tk):
         # Ouvrir l'image à l'aide de la bibliothèque PIL
         if (image_path != None):
             image = Image.open(image_path)
+            image = image.resize((200, 120))  # Remplacer 50, 50 par les dimensions souhaitées
             # Convertir l'image en PhotoImage
             photo = ImageTk.PhotoImage(image)
 
             # Créer un widget Label pour afficher l'image
-            label = tk.Label(self, image=photo)
-            label.image = photo  # Conserver une référence à l'image pour éviter la suppression par le garbage collector
-            label.grid(row=x, column=y)  # Positionner l'image aux coordonnées (x, y)
+            image_label = tk.Label(self, image=photo)
+            image_label.image = photo  # Conserver une référence à l'image pour éviter la suppression par le garbage collector
+            image_label.grid(row=x, column=y)  # Positionner l'image aux coordonnées (x, y)
             # label.grid(row=0, column=0, padx=10, pady=10, sticky="w") #
-            liste_des_pages[actual_page_number].append((label, label.grid_info()))
+            liste_des_pages[actual_page_number].append((image_label, image_label.grid_info()))
 
+            # Créez le bouton avec l'image et attachez la fonction on_click
+            delete_button = tk.Button(self, image=photo, command=lambda: self.remove_image(image_label, delete_button, x, y), bd=0)
+
+            # Assurez-vous de garder une référence à l'image, sinon elle peut être effacée par le garbage collector de Python
+            delete_button.image = photo
+
+            delete_button.grid(row=x, column=y)
+            liste_des_pages[actual_page_number].append((delete_button, delete_button.grid_info()))
+
+    def remove_image(self, label, button, x, y):
+        # "Cacher" le label contenant l'image
+        label.grid_forget()
+        # Détruire le bouton
+        button.grid_forget()
+        button.destroy()
+
+        # ici il faut un -1 #
+        for i in range(len(liste_des_pages[actual_page_number]) - 1):
+            if (liste_des_pages[actual_page_number][i][0] == label):
+                liste_des_pages[actual_page_number].pop(i)
+
+        for i in range(len(liste_des_pages[actual_page_number])):
+            if (liste_des_pages[actual_page_number][i][0] == button):
+                liste_des_pages[actual_page_number].pop(i)
+
+        temp_list = list(liste_des_images[actual_page_number])
+        temp_list[y - 1] = None
+        liste_des_images[actual_page_number] = tuple(temp_list)
 
 # =================================================== #
 #            PARTIE OUVRANT LA MODALE PhotoImage      #
 # =================================================== #
+
     def show_modal(self, image_number):
         image_resizer_modal = ImageResizerModal(self)
         image_resizer_modal.grab_set()
@@ -446,8 +543,20 @@ class YourMainApp(tk.Tk):
         # Reconvertir la liste en tuple et l'assigner à la position actual_page_number
         liste_des_images[actual_page_number] = tuple(temp_list)
         return saved_image_path
+
+# =================================================== #
+#            SUPPRESSION D'UNE PAGE                   #
 # =================================================== #
 
+    def delete_page(self):
+        self.change_page("p")
+        liste_des_pages.pop(actual_page_number + 1)
+        liste_des_images.pop(actual_page_number + 1)
+        liste_des_etats.pop(actual_page_number + 1)
+        self.update_page_number(actual_page_number)
+        self.update_idletasks()
+
+# =================================================== #
 
 if __name__ == "__main__":
     app = YourMainApp()

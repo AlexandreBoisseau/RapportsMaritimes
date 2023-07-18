@@ -10,6 +10,7 @@ class YourMainApp(tk.Tk):
 
         self.title("Main app")
         self.geometry("800x600")
+        self.resizable(False, False)
 
         self.create_widgets()
 
