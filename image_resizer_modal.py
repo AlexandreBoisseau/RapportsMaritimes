@@ -98,7 +98,9 @@ class ImageResizerModal(tk.Toplevel):
         dy = event.y - self.start_y
         x1, y1, x2, y2 = self.image_canvas.coords(self.rectangle)
         width, height = x2 - x1, y2 - y1
-        ratio = width / height
+        ratio = 1.5
+        if (height != 0):
+            ratio = width / height
 
         if self.resizing:
             if self.resize_direction == "SE":
